@@ -11,7 +11,7 @@ st.title("🔮 백춘황 원장의 '9대 항목' 주역 일진")
 def load_data():
     try:
         # 바탕화면에 만드신 '주역.csv'를 깃허브에서 찾아 읽습니다.
-        df = pd.read_csv('주역.csv', encoding='utf-8')
+        df = pd.read_csv('-', encoding='utf-8')
         return df
     except Exception as e:
         st.error("⚠️ '주역.csv' 파일을 찾을 수 없습니다. 깃허브에 파일이 있는지 확인해주세요.")
