@@ -4,7 +4,7 @@ from datetime import datetime
 
 # 1. 페이지 설정 (화면을 넓게 쓰고 제목을 정합니다)
 st.set_page_config(page_title="백춘황의 9대운 주역일진", layout="wide")
-st.title("🔮 백춘황 원장의 '9대 항목' 주역 일진")
+st.title("🔮 보흘 김만기의 '9대 항목' 주역 일진")
 
 # 2. 데이터 불러오기 (주역.csv 파일을 읽어옵니다)
 @st.cache_data
