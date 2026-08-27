@@ -988,6 +988,8 @@ function playIntro(lang) {
   var p = v.play();
   if (p && p.catch) p.catch(function(){});
 }
+
+playIntro(typeof _lang === 'string' ? _lang : 'ko');
 </script>
 
 </body>
