@@ -216,12 +216,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   <div class="date-bar" id="dateBar"></div>
 </div>
 
-<div class="guide">
-  <div class="guide-t" id="guideTitle"></div>
-  <div class="guide-txt" id="guideText"></div>
-  <div class="tips"><span class="tip" id="tipText"></span><br><span class="tip" id="tipText2"></span></div>
-</div>
-
 <div class="intro-sec">
   <div class="intro-ttl">소개영상</div>
   <div class="intro-langs">
@@ -231,9 +225,15 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     <button type="button" class="intro-btn" data-lang="es" onclick="playIntro('es')">Español</button>
     <button type="button" class="intro-btn" data-lang="hi" onclick="playIntro('hi')">हिन्दी</button>
   </div>
-  <div class="intro-player hidden" id="introPlayerWrap">
-    <video id="introVideo" controls playsinline preload="none"></video>
+  <div class="intro-player" id="introPlayerWrap">
+    <video id="introVideo" controls playsinline muted autoplay preload="auto"></video>
   </div>
+</div>
+
+<div class="guide">
+  <div class="guide-t" id="guideTitle"></div>
+  <div class="guide-txt" id="guideText"></div>
+  <div class="tips"><span class="tip" id="tipText"></span><br><span class="tip" id="tipText2"></span></div>
 </div>
 
 <div class="btn-row">
@@ -978,15 +978,24 @@ function playIntro(lang) {
   for (var i = 0; i < btns.length; i++) {
     btns[i].classList.toggle('on', btns[i].getAttribute('data-lang') === lang);
   }
-  v.pause();
+  v.muted = true;
+  v.playsInline = true;
+  v.setAttribute('playsinline', '');
+  v.setAttribute('webkit-playsinline', '');
   wrap.classList.remove('hidden');
+  function start() {
+    v.muted = true;
+    var p = v.play();
+    if (p && p.catch) p.catch(function(){});
+  }
   if (v.getAttribute('data-lang') !== lang) {
     v.setAttribute('data-lang', lang);
     v.src = 'https://kmgg5694.github.io/nameanalyz/videos/' + encodeURIComponent(files[lang]);
-    v.load();
+    v.onloadeddata = start;
+  } else {
+    try { v.currentTime = 0; } catch (e) {}
+    start();
   }
-  var p = v.play();
-  if (p && p.catch) p.catch(function(){});
 }
 
 playIntro(typeof _lang === 'string' ? _lang : 'ko');
