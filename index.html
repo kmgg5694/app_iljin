@@ -145,6 +145,7 @@ body{background:var(--bg);color:var(--text);
 .s-fb{background:#1877f2;color:#fff;}
 .s-cp{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
 .s-qr{background:#27ae60;color:#fff;}
+.s-ns{background:#2c2416;color:#f7e7c6;}
 
 /* ── 다시하기 ── */
 .reset-row{text-align:center;padding:8px 0 22px;}
@@ -284,6 +285,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       <button class="sbtn s-fb" id="sBtnFB" onclick="shareFB()"></button>
       <button class="sbtn s-cp" id="sBtnCP" onclick="copyLink()"></button>
       <button class="sbtn s-qr" id="sBtnQR" onclick="showQR()"></button>
+      <button class="sbtn s-ns" id="sBtnNS" onclick="shareNative()"></button>
     </div>
   </div>
   <div class="reset-row">
@@ -336,7 +338,7 @@ const UI = {
     adTxt:'광고 진행 중… 잠시 후 결과가 공개됩니다',
     secBon:'오전 운세 · 본괘', secByeon:'오후 운세 · 변괘',
     shareTtl:'📤 결과 공유하기',
-    sBtnKK:'💬 카카오톡', sBtnFB:'📘 페이스북', sBtnCP:'🔗 링크복사', sBtnQR:'▦ QR코드',
+    sBtnKK:'💬 카카오톡', sBtnFB:'📘 페이스북', sBtnCP:'🔗 링크복사', sBtnQR:'▦ QR코드', sBtnNS:'📤 공유하기',
     resetBtn:'⟳ &nbsp; 다 시 하 기',
     footer:'© 김만기 이름연구소 · 자미역일진<br>',
     modalTtl:'역점 재사용 안내',
@@ -374,7 +376,7 @@ function _getUI(lang) {
     secBon:'Morning Fortune · Primary Hexagram',
     secByeon:'Afternoon Fortune · Changing Hexagram',
     shareTtl:'📤 Share Reading',
-    sBtnKK:'💬 KakaoTalk', sBtnFB:'📘 Facebook', sBtnCP:'🔗 Copy Link', sBtnQR:'▦ QR Code',
+    sBtnKK:'💬 KakaoTalk', sBtnFB:'📘 Facebook', sBtnCP:'🔗 Copy Link', sBtnQR:'▦ QR Code', sBtnNS:'📤 Share',
     resetBtn:'⟳ &nbsp; R E S E T',
     footer:'© I-Ching Oracle · Zami Daily<br>For reference only',
     modalTtl:'Oracle Warning',
@@ -406,7 +408,7 @@ function _getUI(lang) {
     secBon:'प्रातःकाल दिनफल · मूल षट्कोण',
     secByeon:'सायंकाल दिनफल · परिवर्तन षट्कोण',
     shareTtl:'📤 परिणाम साझा करें',
-    sBtnKK:'💬 काकाओटॉक', sBtnFB:'📘 फेसबुक', sBtnCP:'🔗 लिंक कॉपी', sBtnQR:'▦ QR कोड',
+    sBtnKK:'💬 काकाओटॉक', sBtnFB:'📘 फेसबुक', sBtnCP:'🔗 लिंक कॉपी', sBtnQR:'▦ QR कोड', sBtnNS:'📤 साझा करें',
     resetBtn:'➳   पुनः करें',
     footer:'© किम मन-गी नाम अनुसंधान संस्थान · ज़ामी दिनफल<br>यह दिनफल केवल संदर्भ के लिए है',
     modalTtl:'दिव्य चेतावनी',
@@ -434,7 +436,7 @@ function _getUI(lang) {
     secBon:'Hexagrama Original (Mañana)',
     secByeon:'Hexagrama Transformado (Tarde)',
     shareTtl:'📤 Compartir Destino',
-    sBtnKK:'💬 Compartir', sBtnFB:'📘 Facebook', sBtnCP:'🔗 Copiar enlace', sBtnQR:'▦ Código QR',
+    sBtnKK:'💬 Compartir', sBtnFB:'📘 Facebook', sBtnCP:'🔗 Copiar enlace', sBtnQR:'▦ Código QR', sBtnNS:'📤 Más apps',
     resetBtn:'⟳ Nueva Consulta',
     footer:'© Instituto I-Ching Kim Man-gi · Jami I-Ching Diario<br>',
     modalTtl:'Aviso de Re-consulta',
@@ -464,7 +466,7 @@ function _getUI(lang) {
       secBon:'午前の運勢・本卦',
       secByeon:'午後の運勢・変卦',
       shareTtl:'📤 結果をシェアする',
-      sBtnKK:'💬 カカオトーク', sBtnFB:'📘 フェイスブック', sBtnCP:'🔗 リンクコピー', sBtnQR:'▦ QRコード',
+      sBtnKK:'💬 カカオトーク', sBtnFB:'📘 フェイスブック', sBtnCP:'🔗 リンクコピー', sBtnQR:'▦ QRコード', sBtnNS:'📤 シェア',
       resetBtn:'⟳ &nbsp; や り な お す',
       footer:'© キム・マンギ 名前研究所 · 紫微易日運<br>',
       modalTtl:'再占いのご案内',
@@ -621,7 +623,7 @@ function updateUI() {
   document.body.className = 'lang-' + _lang;
   const el = (id) => document.getElementById(id);
   ['mainTitle','subtitle','guideTitle','adTxt','secBon','secByeon','shareTtl',
-   'sBtnKK','sBtnFB','sBtnCP','sBtnQR','modalTtl','modalNo','modalYes','qrTtl','qrClose'
+   'sBtnKK','sBtnFB','sBtnCP','sBtnQR','sBtnNS','modalTtl','modalNo','modalYes','qrTtl','qrClose'
   ].forEach(id => { if(el(id)) el(id).textContent = _getUI(_lang)[id] || ''; });
   if(el('guideText'))  el('guideText').innerHTML  = t.guideText;
   if(el('modalBody'))  el('modalBody').innerHTML  = t.modalBody;
@@ -913,6 +915,16 @@ function copyLink(){
   const t=_getUI(_lang);
   if(navigator.clipboard) navigator.clipboard.writeText(location.href)
     .then(()=>showToast(t.copyToast||'✅ 링크 복사됨'));
+}
+function shareNative(){
+  var t=_getUI(_lang);
+  var title=t.appTitle||t.mainTitle||'자미역 일진';
+  var url=location.href;
+  if(navigator.share){
+    navigator.share({title:title,text:title,url:url}).catch(function(){});
+  } else {
+    showToast(t.shareNativeNeed||'휴대폰에서 누르면 설치된 앱으로 공유됩니다');
+  }
 }
 function showToast(msg){
   const t=document.getElementById('toast');
