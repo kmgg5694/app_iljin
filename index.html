@@ -232,7 +232,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 </div>
 
 <div class="intro-sec">
-  <div class="intro-ttl">소개영상</div>
+  <div class="intro-ttl" id="introTtl">소개영상</div>
   <div class="intro-langs">
     <button type="button" class="intro-btn" data-lang="ko" onclick="playIntro('ko')">한국어</button>
     <button type="button" class="intro-btn" data-lang="en" onclick="playIntro('en')">English</button>
@@ -1026,10 +1026,19 @@ function playIntro(lang) {
     es: '자미역일진_소개_스페인어.mp4',
     hi: '자미역일진_소개_힌디어.mp4'
   };
+  var titles = {
+    ko: '소개영상',
+    en: 'Intro Video',
+    ja: '紹介動画',
+    es: 'Video de introducción',
+    hi: 'परिचय वीडियो'
+  };
   var wrap = document.getElementById('introPlayerWrap');
   var v = document.getElementById('introVideo');
   var btns = document.querySelectorAll('.intro-btn');
   if (!wrap || !v || !files[lang]) return;
+  var ttl = document.getElementById('introTtl');
+  if (ttl) ttl.textContent = titles[lang] || titles.ko;
   for (var i = 0; i < btns.length; i++) {
     btns[i].classList.toggle('on', btns[i].getAttribute('data-lang') === lang);
   }
