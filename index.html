@@ -920,11 +920,27 @@ function shareNative(){
   var t=_getUI(_lang);
   var title=t.appTitle||t.mainTitle||'자미역 일진';
   var url=location.href;
-  if(navigator.share){
-    navigator.share({title:title,text:title,url:url}).catch(function(){});
-  } else {
-    showToast(t.shareNativeNeed||'휴대폰에서 누르면 설치된 앱으로 공유됩니다');
+  var txt=title+String.fromCharCode(10)+url;
+  var guide=t.shareNativeCopy||'📋 링크가 복사되었습니다. 카카오톡·문자에 붙여넣으세요!';
+  var instagram=/Instagram/i.test(navigator.userAgent||'');
+  function copyGuide(){
+    var ta=document.createElement('textarea');
+    ta.value=txt;
+    ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    var ok=false;
+    try{ ok=document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    if(ok){ showToast(guide); }
+    else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ showToast(guide); }); }
+    else { showToast(guide); }
   }
+  if(instagram || !navigator.share){
+    copyGuide();
+    return;
+  }
+  navigator.share({title:title,text:title,url:url}).catch(copyGuide);
 }
 function showToast(msg){
   const t=document.getElementById('toast');
