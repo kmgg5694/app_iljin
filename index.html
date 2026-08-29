@@ -351,7 +351,8 @@ const UI = {
     tipText2:'"같은 항목이 오전에서 오후로 어떻게 변하는지 확인 하시기 바랍니다."',
 
     shareToast:'📋 카카오톡에 붙여넣기!',
-    copyToast:'✅ 링크가 복사되었습니다',
+    copyToast:'✅ 결과가 복사되었습니다',
+    shareNativeCopy:'📋 결과가 복사되었습니다. 카카오톡·문자에 붙여넣으세요!',
     appTitle:'자미역 일진',
     installBtn:'📲 앱으로 설치',    dateText:(y,m,d,day)=>y+'년 '+m+'월 '+d+'일 ('+day+'요일) · 오늘의 자미역 일진'
   },
@@ -388,7 +389,8 @@ function _getUI(lang) {
     tipText:'Consult at a set time · once per day only.',
     tipText2:'"Please check how each category changes from morning to afternoon."',
     shareToast:'📋 Paste in KakaoTalk or Messages!',
-    copyToast:'✅ Link copied!',
+    copyToast:'✅ Result copied!',
+    shareNativeCopy:'📋 Result copied. Paste in KakaoTalk or Messages!',
     appTitle:'Zami I-Ching',
     installBtn:'📲 Install App',
     dateText:(y,m,d,day)=>day+', '+(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1])+' '+d+', '+y+' · Daily Cosmic Rhythm'
@@ -420,7 +422,8 @@ function _getUI(lang) {
     dateText:(y,m,d,day)=>{ function dv(n){return String(n).replace(/[0-9]/g,c=>'०१२३४५६७८९'[c]);} return day+', '+([ 'जन','फ़र','मार्च','अप्र','मई','जून','जुल','अग','सित','अक्त','नव','दिस'][m-1])+' '+dv(d)+', '+dv(y)+' · आज का दिनफल'; },
     appTitle:'ज़ामी आई-चिंग',
     shareToast:'📋 काकाओटॉक में चिपकाएं!',
-    copyToast:'✅ लिंक कॉपी हो गया!',
+    copyToast:'✅ परिणाम कॉपी हो गया!',
+    shareNativeCopy:'📋 परिणाम कॉपी हो गया। काकाओटॉक में चिपकाएं!',
     installBtn:'📲 ऐप इंस्टॉल करें',
     };
     return UI._hi;
@@ -447,7 +450,8 @@ function _getUI(lang) {
     tipText:'Consulta el oráculo solo una vez al día, preferiblemente a la misma hora.',
     tipText2:'"Observa la sabiduría del cambio de la mañana a la tarde."',
     shareToast:'📋 ¡Pégalo en tu chat!',
-    copyToast:'✅ Enlace copiado',
+    copyToast:'✅ Resultado copiado',
+    shareNativeCopy:'📋 Resultado copiado. Pégalo en el chat.',
     appTitle:'Jami I-Ching Diario',
     installBtn:'📲 Instalar App',
     shareMsg:'🔮 ',
@@ -478,7 +482,8 @@ function _getUI(lang) {
       tipText:'毎日決まった時間に、一日一回だけご覧ください。',
       tipText2:'「午前から午後にかけて各項目がどのように変化するかご確認ください。」',
       shareToast:'📋 カカオトークに貼り付けてください！',
-      copyToast:'✅ リンクがコピーされました',
+      copyToast:'✅ 結果をコピーしました',
+      shareNativeCopy:'📋 結果をコピーしました。カカオトークに貼り付けてください！',
       appTitle:'紫微易日運',
       installBtn:'📲 アプリをインストール',
       shareMsg:'🔮 ',
@@ -892,55 +897,90 @@ function showQR(){
 }
 function closeQR(){ document.getElementById('qrOv').classList.remove('on'); }
 
-// 공유
+function _cardPlain(id){
+  var el=document.getElementById(id);
+  if(!el) return '';
+  return (el.innerText||el.textContent||'').replace(/\n{3,}/g,'\n\n').trim();
+}
+function _shareResultText(){
+  var nl=String.fromCharCode(10);
+  var d=new Date();
+  var ds=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+  var title='오늘의 자미역일진 ('+ds+')';
+  if(_lang==='en') title="Today's Zami I-Ching ("+ds+")";
+  else if(_lang==='hi') title='आज का ज़ामी दिनफल ('+ds+')';
+  else if(_lang==='es') title='Jami I-Ching de hoy ('+ds+')';
+  else if(_lang==='ja') title='本日の紫微易日進 ('+ds+')';
+  var bonName='', byeName='';
+  if(bon){
+    bonName=bon._sym||'';
+    if(_lang==='ko') bonName=(bon._sym||'')+' '+(bon.name||'');
+    else if(_lang==='en'){ var eb=_getEN(bon._sym); if(eb) bonName=(bon._sym||'')+' '+eb.name; }
+    else if(_lang==='hi'){ var hb=_getHI(bon._sym); if(hb) bonName=(bon._sym||'')+' '+hb.name; }
+    else if(_lang==='es'){ var sb=_getES(bon._sym); if(sb) bonName=(bon._sym||'')+' '+sb.name; }
+    else if(_lang==='ja'){ var jb=_getJA(bon._sym); if(jb) bonName=(bon._sym||'')+' '+jb.name; }
+  }
+  if(byeon){
+    byeName=byeon._sym||'';
+    if(_lang==='ko' && byeon.name) byeName=(byeon._sym||'')+' '+byeon.name;
+    else if(_lang==='en'){ var eby=_getEN(byeon._sym); if(eby) byeName=(byeon._sym||'')+' '+eby.name; }
+    else if(_lang==='hi'){ var hby=_getHI(byeon._sym); if(hby) byeName=(byeon._sym||'')+' '+hby.name; }
+    else if(_lang==='es'){ var sby=_getES(byeon._sym); if(sby) byeName=(byeon._sym||'')+' '+sby.name; }
+    else if(_lang==='ja'){ var jby=_getJA(byeon._sym); if(jby) byeName=(byeon._sym||'')+' '+jby.name; }
+  }
+  var head='🎯 '+bonName+(byeName?' → '+byeName:'');
+  var note='※ 일진은 그 순간의 기운이라 매일 새로 확인하는 것이 정확합니다. 앱: kmgg5694.github.io/app_iljin';
+  if(_lang==='en') note='※ Daily fortune reflects the energy of that moment — check anew each day. App: kmgg5694.github.io/app_iljin';
+  else if(_lang==='hi') note='※ दैनिक फल उसी क्षण की ऊर्जा है — प्रतिदिन नया देखें। ऐप: kmgg5694.github.io/app_iljin';
+  else if(_lang==='es') note='※ El oráculo del día es la energía de ese momento; confírmelo de nuevo cada día. App: kmgg5694.github.io/app_iljin';
+  else if(_lang==='ja') note='※ 日進はその瞬間の気なので、毎日あらためて見るのが正確です。アプリ: kmgg5694.github.io/app_iljin';
+  var parts=[title, head];
+  var bonTxt=_cardPlain('bonCard');
+  var byeTxt=_cardPlain('byeonCard');
+  if(bonTxt) parts.push(bonTxt);
+  if(byeTxt) parts.push(byeTxt);
+  parts.push('', note);
+  return parts.join(nl);
+}
+function _copyShareText(txt, msg){
+  var ta=document.createElement('textarea');
+  ta.value=txt;
+  ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  var ok=false;
+  try{ ok=document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+  if(ok){ showToast(msg); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ showToast(msg); }); }
+  else { showToast(msg); }
+}
 function shareKakao(){
   if(!bon) return;
   var t=_getUI(_lang);
-  var bonName=bon._sym||'', byeName=(byeon&&byeon._sym)?byeon._sym:'';
-  if(_lang==='ko'){ bonName=bon._sym+' '+bon.name; byeName=(byeon&&byeon.name)?byeon._sym+' '+byeon.name:''; }
-  else if(_lang==='en'){ var eb=_getEN(bon._sym); if(eb) bonName=bon._sym+' '+eb.name; }
-  else if(_lang==='hi'){ var hb=_getHI(bon._sym); if(hb) bonName=bon._sym+' '+hb.name; }
-  else if(_lang==='es'){ var sb=_getES(bon._sym); if(sb) bonName=bon._sym+' '+sb.name; }
-  else if(_lang==='ja'){ var jb=_getJA(bon._sym); if(jb) bonName=bon._sym+' '+jb.name; }
-  var nl=String.fromCharCode(10);
-  var txt=(t.shareMsg||'🔮 ')+bonName+(byeName?' → '+byeName:'')+nl+location.href;
-  function doCopy(){ if(navigator.clipboard) navigator.clipboard.writeText(txt).then(function(){ showToast(t.shareToast||'Copied'); }); }
-  if(navigator.share){ navigator.share({title:t.appTitle||'I-Ching',text:txt,url:location.href}).catch(doCopy); }
-  else { doCopy(); }
+  var txt=_shareResultText();
+  if(navigator.share){ navigator.share({title:t.appTitle||'I-Ching',text:txt}).catch(function(){ _copyShareText(txt, t.shareToast||'Copied'); }); }
+  else { _copyShareText(txt, t.shareToast||'Copied'); }
 }
 function shareFB(){
   window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank');
 }
 function copyLink(){
-  const t=_getUI(_lang);
-  if(navigator.clipboard) navigator.clipboard.writeText(location.href)
-    .then(()=>showToast(t.copyToast||'✅ 링크 복사됨'));
+  if(!bon) return;
+  var t=_getUI(_lang);
+  _copyShareText(_shareResultText(), t.copyToast||'✅ 결과가 복사되었습니다');
 }
 function shareNative(){
+  if(!bon) return;
   var t=_getUI(_lang);
-  var title=t.appTitle||t.mainTitle||'자미역 일진';
-  var url=location.href;
-  var txt=title+String.fromCharCode(10)+url;
-  var guide=t.shareNativeCopy||'📋 링크가 복사되었습니다. 카카오톡·문자에 붙여넣으세요!';
+  var txt=_shareResultText();
+  var guide=t.shareNativeCopy||'📋 결과가 복사되었습니다. 카카오톡·문자에 붙여넣으세요!';
   var instagram=/Instagram/i.test(navigator.userAgent||'');
-  function copyGuide(){
-    var ta=document.createElement('textarea');
-    ta.value=txt;
-    ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0;';
-    document.body.appendChild(ta);
-    ta.focus(); ta.select();
-    var ok=false;
-    try{ ok=document.execCommand('copy'); }catch(e){}
-    document.body.removeChild(ta);
-    if(ok){ showToast(guide); }
-    else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ showToast(guide); }); }
-    else { showToast(guide); }
-  }
   if(instagram || !navigator.share){
-    copyGuide();
+    _copyShareText(txt, guide);
     return;
   }
-  navigator.share({title:title,text:title,url:url}).catch(copyGuide);
+  navigator.share({text:txt}).catch(function(){ _copyShareText(txt, guide); });
 }
 function showToast(msg){
   const t=document.getElementById('toast');
