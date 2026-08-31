@@ -740,6 +740,33 @@ let cnt=0, vals=[], bon=null, byeon=null, timer=null;
 // 1천 2택 3화 4뢰 5풍 6수 7산 8지
 const TRI_NAME=['천','택','화','뢰','풍','수','산','지'];
 
+function resultShareUrl(){
+  if(!vals[0]||!vals[1]||!vals[2]) return location.origin+location.pathname;
+  var g=new URLSearchParams();
+  g.set('c',String(vals[0])); g.set('j',String(vals[1])); g.set('i',String(vals[2])); g.set('r','1');
+  return location.origin+location.pathname+'?'+g.toString();
+}
+function persistResultUrl(){
+  try{ history.replaceState(null,'',resultShareUrl()); }catch(e){}
+}
+function restorePressedUI(){
+  var tn=(_lang==='en')?['Heaven','Lake','Fire','Thunder','Wind','Water','Mountain','Earth']:(_lang==='hi')?['आकाश','झील','अग्नि','वज्र','वायु','जल','पर्वत','पृथ्वी']:(_lang==='ja')?['けん','だ','り','しん','そん','かん','ごん','こん']:TRI_NAME;
+  var el0=document.getElementById('bC'), el1=document.getElementById('bJ'), el2=document.getElementById('bI');
+  if(el0&&vals[0]){ el0.classList.add('btn-done'); el0.querySelector('.lbl').textContent=TR[vals[0]-1]+' '+vals[0]+' '+tn[vals[0]-1]; }
+  if(el1&&vals[1]){ el1.classList.add('btn-done'); el1.querySelector('.lbl').textContent=TR[vals[1]-1]+' '+vals[1]+' '+tn[vals[1]-1]; }
+  if(el2&&vals[2]){ el2.classList.add('btn-done'); el2.querySelector('.lbl').textContent=(_lang==='en')?'Line '+vals[2]:(_lang==='hi')?'रेखा '+vals[2]:(_lang==='ja')?vals[2]+'爻':vals[2]+'효'; }
+}
+function restoreResultFromUrl(){
+  var g=new URLSearchParams(location.search);
+  if(g.get('r')!=='1') return;
+  var c=parseInt(g.get('c'),10), j=parseInt(g.get('j'),10), i=parseInt(g.get('i'),10);
+  if(!(c>=1&&c<=8&&j>=1&&j<=8&&i>=1&&i<=6)) return;
+  vals=[c,j,i]; cnt=3;
+  restorePressedUI();
+  showBon();
+  showByeon();
+}
+
 function press(i){
   if(cnt>=3) return;
   const ids=['bC','bJ','bI'];
@@ -825,6 +852,7 @@ function showByeon(){
   _renderCard(byeSym, 'byeonCard');
   document.getElementById('byeonArea').classList.remove('hidden');
   document.getElementById('adBox').classList.add('hidden');
+  persistResultUrl();
 }
 
 // 텍스트 포맷: 운세) 사업) 금전) 애정) 건강) 앞에 줄바꿈
@@ -845,6 +873,7 @@ function card(g, sym){
 function openModal(){ document.getElementById('modal').classList.add('on'); }
 function closeModal(){ document.getElementById('modal').classList.remove('on'); }
 function doReset(){ _lastBonSym=null; _lastByeSym=null;
+  try{ history.replaceState(null,'',location.pathname); }catch(e){}
   closeModal(); cnt=0; vals=[]; bon=null; byeon=null;
   if(timer){ clearInterval(timer); timer=null; }
   // 버튼 원상복귀 (ico 심볼 + lbl 텍스트 모두)
@@ -874,7 +903,7 @@ function showQR(){
     alert('QR 공유 기능은 인터넷 주소(https://)에서만 사용 가능합니다.\n카카오톡 공유 버튼을 이용해 주세요.');
     return;
   }
-  const url = location.href;
+  const url = resultShareUrl();
   document.getElementById('qrUrl').textContent = url;
   document.getElementById('qrOv').classList.add('on');
   const qrDiv = document.getElementById('qrcode');
@@ -939,7 +968,7 @@ function _shareResultText(){
   var byeTxt=_cardPlain('byeonCard');
   if(bonTxt) parts.push(bonTxt);
   if(byeTxt) parts.push(byeTxt);
-  parts.push('', note);
+  parts.push('', note, resultShareUrl());
   return parts.join(nl);
 }
 function _copyShareText(txt, msg){
@@ -963,7 +992,7 @@ function shareKakao(){
   else { _copyShareText(txt, t.shareToast||'Copied'); }
 }
 function shareFB(){
-  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank');
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(resultShareUrl()),'_blank');
 }
 function copyLink(){
   if(!bon) return;
@@ -987,6 +1016,8 @@ function showToast(msg){
   t.textContent=msg; t.classList.add('on');
   setTimeout(()=>t.classList.remove('on'),2500);
 }
+
+restoreResultFromUrl();
 
 </script>
 
