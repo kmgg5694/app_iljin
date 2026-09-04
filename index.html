@@ -608,6 +608,12 @@ function _getJA(sym) {
 
 
 let _lang = 'ko';
+(function(){
+  try {
+    var L=(new URLSearchParams(location.search)).get('lang');
+    if(L&&{ko:1,en:1,hi:1,es:1,ja:1}[L]) _lang=L;
+  } catch(e){}
+})();
 
 function setLang(lang) {
   _lang = lang;
@@ -651,7 +657,17 @@ function updateUI() {
   if(ib && ib.dataset.visible) ib.textContent=t.installBtn||'📲 Install';
 }
 
-(function(){ if(document.body){ updateUI(); } else { document.addEventListener("DOMContentLoaded", updateUI); } })();
+(function(){
+  try {
+    var L=(new URLSearchParams(location.search)).get('lang');
+    if(L&&{ko:1,en:1,hi:1,es:1,ja:1}[L]){
+      if(document.body){ setLang(L); }
+      else { document.addEventListener("DOMContentLoaded", function(){ setLang(L); }); }
+      return;
+    }
+  } catch(e){}
+  if(document.body){ updateUI(); } else { document.addEventListener("DOMContentLoaded", updateUI); }
+})();
 
 
 var _lastBonSym = null, _lastByeSym = null;
