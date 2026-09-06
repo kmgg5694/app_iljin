@@ -9,8 +9,26 @@
   var iosSafari = iOS && /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|Instagram|FBAN|FBAV|Line\//i.test(ua);
   var wantInstall = /(?:\?|&)install=1(?:&|#|$)/.test(location.search + location.hash) || location.hash.indexOf("install") !== -1;
   var isEn = /\/english\/?$/.test(location.pathname.replace(/index\.html$/, ""));
+  var langParam = "";
+  try { langParam = (new URLSearchParams(location.search)).get("lang") || ""; } catch (e) {}
   var deferredPrompt = null;
 
+  var tHi = {
+    install: "इंस्टॉल",
+    installing: "इंस्टॉल खुल रहा है…",
+    installed: "होम स्क्रीन पर जोड़ा गया",
+    wait: "इंस्टॉल बटन तैयार हो रहा है…",
+    chromeMenu: "Chrome मेनू (⋮) → ऐप इंस्टॉल करें",
+    iosTitle: "होम स्क्रीन पर जोड़ें",
+    iosSafari: "पहले Safari में यह पृष्ठ खोलें। होम स्क्रीन जोड़ केवल Safari में उपलब्ध है।",
+    copy: "लिंक कॉपी करें",
+    copied: "कॉपी हो गया",
+    close: "बंद करें",
+    step1: "Safari के नीचे शेयर बटन दबाएं",
+    step2: "सूची में ऊपर जाकर होम स्क्रीन पर जोड़ें दबाएं",
+    step3: "ऊपर दाएं जोड़ें दबाएं",
+    bar: "होम स्क्रीन पर जोड़ें"
+  };
   var t = isEn ? {
     install: "Install",
     installing: "Opening install…",
@@ -26,7 +44,7 @@
     step2: "Scroll and tap Add to Home Screen",
     step3: "Tap Add at the top right",
     bar: "Add to Home Screen"
-  } : {
+  } : (langParam === "hi" ? tHi : {
     install: "홈 화면에 설치",
     installing: "설치 창을 엽니다…",
     installed: "홈 화면에 추가되었습니다",
@@ -41,7 +59,7 @@
     step2: "목록을 올려 「홈 화면에 추가」를 누르세요",
     step3: "오른쪽 위 「추가」를 누르면 완료입니다",
     bar: "홈 화면에 추가"
-  };
+  });
 
   if ("serviceWorker" in navigator) {
     var base = location.origin + location.pathname.replace(/index\.html$/, "");

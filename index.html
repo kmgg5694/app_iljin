@@ -417,14 +417,16 @@ function _getUI(lang) {
     modalBody:'एक दिन में केवल <strong>एक बार</strong> देखना नियम है।<br>उसी दिन पुनः देखने से<br><strong>दिव्य शक्ति बहुत क्षीण हो जाती है।</strong><br><br>क्या आप सचमुच पुनः करना चाहते हैं?',
     modalNo:'रद्द करें', modalYes:'पुनः करें',
     qrTtl:'📲 QR कोड द्वारा साझा करें', qrClose:'बंद करें',
-    qrCopyMsg:'QR: ऊपर का URL कॉपी करें',
+    qrCopyMsg:'ऊपर दिए गए पते की प्रतिलिपि बनाएं',
     days:['रवि','सोम','मंगल','बुध','गुरु','शुक्र','शनि'],
     dateText:(y,m,d,day)=>{ function dv(n){return String(n).replace(/[0-9]/g,c=>'०१२३४५६७८९'[c]);} return day+', '+([ 'जन','फ़र','मार्च','अप्र','मई','जून','जुल','अग','सित','अक्त','नव','दिस'][m-1])+' '+dv(d)+', '+dv(y)+' · आज का दिनफल'; },
     appTitle:'ज़ामी आई-चिंग',
     shareToast:'📋 काकाओटॉक में चिपकाएं!',
     copyToast:'✅ परिणाम कॉपी हो गया!',
-    shareNativeCopy:'📋 परिणाम कॉपी हो गया। काकाओटॉक में चिपकाएं!',
+    shareNativeCopy:'📋 परिणाम कॉपी हो गया। काकाओटॉक या संदेश में चिपकाएं!',
     installBtn:'📲 ऐप इंस्टॉल करें',
+    qrHttpsAlert:'QR साझा केवल इंटरनेट पते (https://) पर उपलब्ध है।\nकाकाओटॉक साझा बटन का उपयोग करें।',
+    pageTitle:'ज़ामी दिनफल'
     };
     return UI._hi;
   }
@@ -668,6 +670,11 @@ function updateUI() {
   var ib=document.getElementById('pwa-install-btn');
   if(ib && ib.dataset.visible) ib.textContent=t.installBtn||'📲 Install';
   lockCountryUI(_lang);
+  if(t.pageTitle) document.title = t.pageTitle;
+  else if(_lang==='ko') document.title = '자미역일진';
+  else if(_lang==='en') document.title = 'Jami Fortune';
+  else if(_lang==='es') document.title = 'Jami Fortune';
+  else if(_lang==='ja') document.title = '紫微易日進';
 }
 
 (function(){
@@ -930,7 +937,8 @@ function doReset(){ _lastBonSym=null; _lastByeSym=null;
 // QR코드
 function showQR(){
   if(location.protocol === 'file:'){
-    alert('QR 공유 기능은 인터넷 주소(https://)에서만 사용 가능합니다.\n카카오톡 공유 버튼을 이용해 주세요.');
+    var t=_getUI(_lang);
+    alert((t&&t.qrHttpsAlert)||'QR 공유 기능은 인터넷 주소(https://)에서만 사용 가능합니다.\n카카오톡 공유 버튼을 이용해 주세요.');
     return;
   }
   const url = resultShareUrl();
