@@ -615,15 +615,27 @@ let _lang = 'ko';
   } catch(e){}
 })();
 
+function lockCountryUI(lang) {
+  lang = lang || _lang || 'ko';
+  var idMap = {ko:'lswKo', en:'lswEn', hi:'lswHi', es:'lswEs', ja:'lswJa'};
+  document.querySelectorAll('.lsw-btn').forEach(function(b){
+    var keep = (b.id === idMap[lang]);
+    b.style.display = keep ? '' : 'none';
+    b.classList.toggle('active', keep);
+  });
+  document.querySelectorAll('.intro-btn').forEach(function(b){
+    var keep = (b.getAttribute('data-lang') === lang);
+    b.style.display = keep ? '' : 'none';
+    b.classList.toggle('on', keep);
+  });
+}
+
 function setLang(lang) {
   _lang = lang;
-  document.querySelectorAll('.lsw-btn').forEach(b => b.classList.remove('active'));
   var root=document.getElementById('htmlRoot');
   if(root) root.setAttribute('lang', lang);
   document.body.className='lang-'+lang;
-  var idMap = {ko:'lswKo', en:'lswEn', hi:'lswHi', es:'lswEs', ja:'lswJa'};
-  var btn = document.getElementById(idMap[lang]);
-  if(btn) btn.classList.add('active');
+  lockCountryUI(lang);
   // 언어 전환 시 결과 초기화
   doReset();
   updateUI();
@@ -655,6 +667,7 @@ function updateUI() {
 
   var ib=document.getElementById('pwa-install-btn');
   if(ib && ib.dataset.visible) ib.textContent=t.installBtn||'📲 Install';
+  lockCountryUI(_lang);
 }
 
 (function(){
@@ -666,7 +679,8 @@ function updateUI() {
       return;
     }
   } catch(e){}
-  if(document.body){ updateUI(); } else { document.addEventListener("DOMContentLoaded", updateUI); }
+  function boot(){ updateUI(); lockCountryUI(_lang); }
+  if(document.body){ boot(); } else { document.addEventListener("DOMContentLoaded", boot); }
 })();
 
 
@@ -1097,12 +1111,14 @@ function playIntro(lang) {
     es: 'Video de introducción',
     hi: 'परिचय वीडियो'
   };
+  lang = lang || _lang || 'ko';
+  if (typeof lockCountryUI === 'function') lockCountryUI(lang);
   var wrap = document.getElementById('introPlayerWrap');
   var v = document.getElementById('introVideo');
-  var btns = document.querySelectorAll('.intro-btn');
   if (!wrap || !v || !files[lang]) return;
   var ttl = document.getElementById('introTtl');
   if (ttl) ttl.textContent = titles[lang] || titles.ko;
+  var btns = document.querySelectorAll('.intro-btn');
   for (var i = 0; i < btns.length; i++) {
     btns[i].classList.toggle('on', btns[i].getAttribute('data-lang') === lang);
   }
