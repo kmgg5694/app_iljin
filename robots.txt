@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kmgg5694.github.io/app_iljin/sitemap.xml

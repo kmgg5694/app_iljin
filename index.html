@@ -11,7 +11,35 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>자미역 일진</title>
+<meta name="description" content="오늘의 자미역일진 — 본괘·변괘로 보는 중년 이후 하루 운세. 김만기 주역 성명학 이름연구소.">
+<meta name="keywords" content="자미역일진,일진,주역,오늘의운세,김만기,이름연구소">
+<link rel="canonical" href="https://kmgg5694.github.io/app_iljin/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="김만기 이름연구소">
+<meta property="og:title" content="자미역일진 · 김만기 이름연구소">
+<meta property="og:description" content="중년 이후의 하루 기운을 본괘·변괘로 살펴보는 일진 운세.">
+<meta property="og:url" content="https://kmgg5694.github.io/app_iljin/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="자미역일진 · 김만기 이름연구소">
+<meta name="twitter:description" content="중년 이후의 하루 기운을 본괘·변괘로 살펴보는 일진 운세.">
+<title>자미역일진 · 김만기 이름연구소</title>
+<script>
+  window.GA_MEASUREMENT_ID = "G-G76ZRYRJQH";
+  (function () {
+    var id = window.GA_MEASUREMENT_ID;
+    if (!id || /X{4,}/.test(id)) return;
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + id;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    window.gtag = gtag;
+    gtag("js", new Date());
+    gtag("config", id);
+  })();
+</script>
 <style>
 /* ── 힌디 폰트: 기기 내장 폰트 사용 (외부 의존성 없음) ── */
 
@@ -132,6 +160,10 @@ body{background:var(--bg);color:var(--text);
   letter-spacing:2px;padding:16px 0;}
 
 /* ── 공유 ── */
+
+.app-share{margin:14px;padding:16px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);text-align:center;}
+.app-share-t{font-size:16px;font-weight:700;color:var(--gold2);margin-bottom:10px;}
+.app-share-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .share-box{background:var(--bg2);border:1px solid var(--border);
   border-radius:var(--r);padding:18px;margin-bottom:14px;}
 .share-ttl{text-align:center;font-size:16px;font-weight:700;color:var(--gold2);
@@ -274,6 +306,16 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   <div class="guide-t" id="guideTitle"></div>
   <div class="guide-txt" id="guideText"></div>
   <div class="tips"><span class="tip" id="tipText"></span><br><span class="tip" id="tipText2"></span></div>
+</div>
+
+
+<div class="app-share" id="appShareBox">
+  <div class="app-share-t" id="appShareTtl">친구에게 이 앱 보내기</div>
+  <div class="app-share-row">
+    <button class="sbtn s-kk" type="button" id="appShareKK" onclick="shareAppKakao()">💬 카카오톡</button>
+    <button class="sbtn s-qr" type="button" id="appShareQR" onclick="showAppQR()">▦ 앱 QR</button>
+    <button class="sbtn s-cp" type="button" id="appShareCP" onclick="copyAppLink()">🔗 링크복사</button>
+  </div>
 </div>
 
 <div class="btn-row">
@@ -678,6 +720,10 @@ function updateUI() {
   if(el('modalBody'))  el('modalBody').innerHTML  = t.modalBody;
   if(el('resetBtnTxt'))el('resetBtnTxt').innerHTML= t.resetBtn;
   if(el('footer'))     el('footer').innerHTML     = t.footer;
+  if(el('appShareTtl')){
+    var as={ko:'친구에게 이 앱 보내기',en:'Share this app with friends',ja:'このアプリを友人に送る',es:'Comparte esta app con amigos',hi:'इस ऐप को साझा करें'};
+    el('appShareTtl').textContent=as[_lang]||as.ko;
+  }
   if(el('lblC'))       el('lblC').textContent     = t.labelC;
   if(el('lblJ'))       el('lblJ').textContent     = t.labelJ;
   if(el('lblI'))       el('lblI').textContent     = t.labelI;
@@ -1046,12 +1092,56 @@ function _copyShareText(txt, msg){
   else if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ showToast(msg); }); }
   else { showToast(msg); }
 }
+
+function appHomeUrl(){
+  return location.origin + location.pathname.replace(/\/index\.html$/i,'/');
+}
+function _appInviteText(){
+  var nl=String.fromCharCode(10);
+  var t=_getUI(_lang);
+  var title=(t.appTitle||t.mainTitle||'자미역일진');
+  var line='오늘 당신의 컨디션이 궁금하면 눌러 보세요.';
+  if(_lang==='en') line='Curious about today\'s energy? Tap to check.';
+  else if(_lang==='ja') line='今日のコンディションが気になったら押してみてください。';
+  else if(_lang==='es') line='¿Curioso por tu energía de hoy? Pulsa para ver.';
+  else if(_lang==='hi') line='आज की ऊर्जा जाननी हो तो यहाँ दबाएँ।';
+  return title+nl+line+nl+appHomeUrl();
+}
+function shareAppKakao(){
+  var txt=_appInviteText();
+  var t=_getUI(_lang);
+  var toast=t.shareToast||'📋 카카오톡에 붙여넣기!';
+  if(navigator.share){
+    navigator.share({title:t.appTitle||'자미역일진',text:txt,url:appHomeUrl()}).catch(function(){ _copyShareText(txt,toast); });
+  } else { _copyShareText(txt,toast); }
+}
+function copyAppLink(){
+  var t=_getUI(_lang);
+  _copyShareText(_appInviteText(), t.copyToast||'✅ 복사되었습니다');
+}
+function showAppQR(){
+  if(location.protocol === 'file:'){
+    alert((_getUI(_lang).qrHttpsAlert)||'QR은 https에서만 사용할 수 있습니다.');
+    return;
+  }
+  var url=appHomeUrl();
+  document.getElementById('qrUrl').textContent=url;
+  document.getElementById('qrOv').classList.add('on');
+  if(typeof QRCode!=='undefined'){
+    var host=document.getElementById('qrcode');
+    if(host){ host.innerHTML=''; new QRCode(host,{text:url,width:200,height:200}); }
+  }
+}
+
 function shareKakao(){
-  if(!bon) return;
+  if(!bon){ shareAppKakao(); return; }
   var t=_getUI(_lang);
   var txt=_shareResultText();
-  if(navigator.share){ navigator.share({title:t.appTitle||'I-Ching',text:txt}).catch(function(){ _copyShareText(txt, t.shareToast||'Copied'); }); }
-  else { _copyShareText(txt, t.shareToast||'Copied'); }
+  var toast=t.shareToast||'Copied';
+  var inKakao=/KAKAOTALK/i.test(navigator.userAgent||'');
+  if(inKakao){ _copyShareText(txt, toast); return; }
+  if(navigator.share){ navigator.share({title:t.appTitle||'I-Ching',text:txt,url:resultShareUrl()}).catch(function(){ _copyShareText(txt, toast); }); }
+  else { _copyShareText(txt, toast); }
 }
 function shareFB(){
   window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(resultShareUrl()),'_blank');
