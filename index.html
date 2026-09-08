@@ -153,9 +153,17 @@ body{background:var(--bg);color:var(--text);
   border-radius:var(--r);padding:22px;margin-bottom:16px;}
 .c-sym{font-size:56px;text-align:center;line-height:1;margin-bottom:14px;}
 .c-name{text-align:center;font-size:21px;color:var(--gold2);
-  font-weight:700;letter-spacing:3px;margin-bottom:20px;line-height:1.5;}
-.fortune{font-size:16px;line-height:2.2;word-break:keep-all;}
+  font-weight:700;letter-spacing:3px;margin-bottom:20px;line-height:1.5;
+  word-break:keep-all;overflow-wrap:break-word;hyphens:none;-webkit-hyphens:none;}
+.fortune{font-size:16px;line-height:2.2;word-break:keep-all;overflow-wrap:break-word;
+  hyphens:none;-webkit-hyphens:none;}
 .fortune .cat{color:#cc2020;font-weight:700;font-size:15px;}
+.guide-txt,.m-body,.footer,.ad-txt,.share-ttl,.app-share-t,.sec-ttl{
+  word-break:keep-all;overflow-wrap:break-word;hyphens:none;-webkit-hyphens:none;}
+/* Global mobile wrap: stop stray hyphen fragments on CJK / auto-translate */
+body,p,span,div,h1,h2,h3,h4,h5,h6,li,td,th,label,a,button{
+  word-break:keep-all;overflow-wrap:break-word;hyphens:none;-webkit-hyphens:none;-ms-hyphens:none;}
+.qr-url{word-break:break-all;overflow-wrap:anywhere;}
 .divider{text-align:center;color:var(--dim);font-size:15px;
   letter-spacing:2px;padding:16px 0;}
 
@@ -211,14 +219,14 @@ body{background:var(--bg);color:var(--text);
 
 .footer{text-align:center;padding:18px 16px;font-size:14px;color:var(--dim);line-height:2.0;}
 
-/* ES 레이아웃 대응 */
-body.lang-es .fortune{word-break:normal;overflow-wrap:break-word;hyphens:auto;}
-body.lang-es .c-name{word-break:normal;overflow-wrap:break-word;min-height:1.5em;}
+/* ES / JA layout */
+body.lang-es .fortune{word-break:keep-all;overflow-wrap:break-word;hyphens:none;-webkit-hyphens:none;}
+body.lang-es .c-name{word-break:keep-all;overflow-wrap:break-word;min-height:1.5em;hyphens:none;}
 body.lang-es .hbtn .lbl{font-size:13px;letter-spacing:0;}
 body.lang-ja .hbtn{height:150px;max-width:180px;}
 body.lang-ja .hbtn .lbl{font-size:18px;letter-spacing:0;line-height:1.6;text-align:center;white-space:normal;word-break:keep-all;padding:0 8px;}
-body.lang-ja .fortune{font-size:17px;line-height:2.1;word-break:normal;overflow-wrap:break-word;}
-body.lang-ja .c-name{font-size:17px;font-weight:700;letter-spacing:1px;}
+body.lang-ja .fortune{font-size:17px;line-height:2.1;word-break:keep-all;overflow-wrap:break-word;hyphens:none;}
+body.lang-ja .c-name{font-size:17px;font-weight:700;letter-spacing:1px;word-break:keep-all;}
 /* HI 폰트 강제 */
 body.lang-hi .fortune,body.lang-hi .c-name,
 body.lang-hi .guide-txt,body.lang-hi .m-body{font-family:var(--font-hi),sans-serif;}
@@ -976,16 +984,29 @@ function showByeon(){
 
 // 텍스트 포맷: 운세) 사업) 금전) 애정) 건강) 앞에 줄바꿈
 function fmt(txt){
-  return txt
+  return _cleanWrapText(txt||'')
     .replace(/(운세|사업|금전|애정|건강)\)/g,
       (m,p1)=>`<br><span class="cat">【${p1}】</span>`);
 }
 
+function _cleanWrapText(t){
+  if(t==null) return '';
+  return String(t)
+    .replace(/\u00AD/g,'')
+    .replace(/\u200B/g,'')
+    .replace(/\s*[—–−]\s*/g, '. ')
+    .replace(/(^|\s)-\s*(?=[가-힣A-Za-z\u0900-\u097F\u3040-\u30FF])/g, '$1')
+    .replace(/\s{2,}/g,' ')
+    .replace(/\.\s*\./g,'.')
+    .trim();
+}
+
 function card(g, sym){
   var t = _getUI(_lang);
+  var nm = _cleanWrapText(g.name||'');
   return `
     <div class="c-sym">${sym||'☰☰'}</div>
-    <div class="c-name">${g.no}. ${g.name}</div>
+    <div class="c-name">${g.no}. ${nm}</div>
     <div class="fortune">${fmt(g.text)}</div>`;
 }
 
